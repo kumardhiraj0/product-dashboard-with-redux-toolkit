@@ -1,17 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, } from "react";
 import { Card, Button } from "react-bootstrap";
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import {add} from "../store/cartSlice";
+import { getProducts } from "../store/productSlice";
+import { Alert } from "react-bootstrap";
+import StatusCode from "../store/utils/StatusCode";
 const Product = () => {
-  const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
+  const {data:products,status} = useSelector(state=> state.products)
 
   useEffect(() => {
-    fetch("https://fakestoreapi.com/products")
-      .then((response) => response.json())
-      .then((data) => setProducts(data))
-      .catch(err=> console.log(err));
-  }, []);
+    //dispatch an action for fetch products
+    dispatch(getProducts())
+
+    // fetch("https://fakestoreapi.com/products")
+    //   .then((response) => response.json())
+    //   .then((data) => setProducts(data))
+    //   .catch(err=> console.log(err));
+  }, [dispatch]);
+
+  if(status===StatusCode.LOADING){
+    return <p>loading....</p>
+  }
+
+  if(status===StatusCode.ERROR){
+    return <Alert key="danger" variant="danger">
+                Something went wrong! try again later
+            </Alert>
+
+  }
 
   const addToCart = (product)=>{
     //dispatch an add action
